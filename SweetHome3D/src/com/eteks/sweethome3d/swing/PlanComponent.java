@@ -2036,8 +2036,8 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
         double imageableWidth = pageFormat.getImageableWidth();
         double imageableHeight = pageFormat.getImageableHeight();
         float printScale;
-        float rowIndex;
-        float columnIndex;
+        float rowIndex = 0;
+        float columnIndex = 0;
         int pagesPerRow;
         int pagesPerColumn;
         if (this.home.getPrint() == null || this.home.getPrint().getPlanScale() == null) {
@@ -2045,8 +2045,6 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
           printScale = getPrintPreferredScale(g, pageFormat) * LengthUnit.centimeterToInch(72);
           pagesPerRow = 1;
           pagesPerColumn = 1;
-          rowIndex   = 0;
-          columnIndex = 0;
         } else {
           // Apply print scale to paper size expressed in 1/72nds of an inch
           printScale = this.home.getPrint().getPlanScale().floatValue() * LengthUnit.centimeterToInch(72);
@@ -2058,8 +2056,6 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
           if (printedItemBounds.getHeight() * printScale != imageableHeight) {
             pagesPerColumn++;
           }
-          rowIndex = 0;
-          columnIndex = 0;
         }
 
         Graphics2D g2D = (Graphics2D)g.create();

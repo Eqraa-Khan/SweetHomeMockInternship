@@ -684,7 +684,7 @@ public class MultipleLevelsPlanPanel extends JPanel implements PlanView, Printab
       Level originalSelectedLevel = home.getSelectedLevel();
       home.setSelectedLevel(levelToPrint);
       try {
-        return this.planComponent.print(graphics, pageFormat, 0);
+        return this.planComponent.print(graphics, pageFormat, pageIndex);
       } finally {
         home.setSelectedLevel(originalSelectedLevel);
       }
