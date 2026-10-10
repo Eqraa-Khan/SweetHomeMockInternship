@@ -51,6 +51,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -90,7 +91,8 @@ public class MultipleLevelsPlanPanel extends JPanel implements PlanView, Printab
   private static final String MULTIPLE_LEVELS_PANEL_NAME = "multipleLevelsPanel";
   
   private static final ImageIcon sameElevationIcon = SwingTools.getScaledImageIcon(FurnitureTable.class.getResource("resources/sameElevation.png"));
-  
+
+  private final Home            home;
   private PlanComponent planComponent;
   private JScrollPane   planScrollPane;
   private JTabbedPane   multipleLevelsTabbedPane;
@@ -100,6 +102,7 @@ public class MultipleLevelsPlanPanel extends JPanel implements PlanView, Printab
                                  UserPreferences preferences, 
                                  PlanController controller) {
     super(new CardLayout());
+    this.home = home;
     createComponents(home, preferences, controller);
     layoutComponents();
     updateSelectedTab(home);
@@ -662,7 +665,32 @@ public class MultipleLevelsPlanPanel extends JPanel implements PlanView, Printab
    * Prints the plan component.
    */
   public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-    return this.planComponent.print(graphics, pageFormat, pageIndex);
+    List<Level> viewableLevels = new ArrayList<Level>();
+    for (Level level : home.getLevels()) {
+      if (level.isViewable()) {
+        viewableLevels.add(level);
+      }
+    }
+
+    if (viewableLevels.isEmpty()) {
+      if (pageIndex == 0) {
+        return this.planComponent.print(graphics, pageFormat, pageIndex);
+      }
+      return NO_SUCH_PAGE;
+    }
+
+    if (pageIndex >= 0 && pageIndex < viewableLevels.size()) {
+      Level levelToPrint = viewableLevels.get(pageIndex);
+      Level originalSelectedLevel = home.getSelectedLevel();
+      home.setSelectedLevel(levelToPrint);
+      try {
+        return this.planComponent.print(graphics, pageFormat, 0);
+      } finally {
+        home.setSelectedLevel(originalSelectedLevel);
+      }
+    }
+
+    return NO_SUCH_PAGE;
   }
 
   /**
